@@ -65,6 +65,9 @@ public class MainActivity extends Activity implements SensorEventListener
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        //Show instructions on start
+        Toast.makeText(getApplicationContext(), "Tilt the device to control the ball", Toast.LENGTH_LONG).show();
+
         //creating tiles and tilemap
         Bitmap bmp;
 
