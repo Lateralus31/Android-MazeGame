@@ -102,13 +102,13 @@ public class MainActivity extends Activity implements SensorEventListener
 
         //Calculate Boundry
         Display display = getWindowManager().getDefaultDisplay();
-        ball.setxPosition(50);
-        ball.setyPosition(50);
+        ball.setxPosition(40);
+        ball.setyPosition(40);
 
         Point size = new Point();
         display.getSize(size);
         ball.xmax = size.x - 50; //(float)display.getWidth()
-        ball.ymax = size.y - 50; //(float)display.getHeight()
+        ball.ymax = size.y - 50; //(float)display.getHeight()\
 
         //Set boundbox for Finish etc
         finish.updateBounds();
@@ -220,32 +220,12 @@ public class MainActivity extends Activity implements SensorEventListener
         {
             ball.setxAcceleration(0);
             ball.setyAcceleration(0);
-            //Toast.makeText(getApplicationContext(), "You WIN!!", Toast.LENGTH_SHORT).show();
         }
         else if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
         {
-            ball.yAcceleration = event.values[1];
-            ball.xAcceleration = event.values[2];
-            ball.updateBall();
-
-            // the bones of my collision detection
-            //it checks after the ball has moved and if it is in a wall then it moves it back to where it was before
-            //ball stores its last position each time.
-            // might be not working properly because of the floats and the collision detection being done in ints and rects but idk
-            if (wallCheck())
-            {//if new position is ina wall then send ball to last position
-                ball.lastPosition();
-            }
-            ball.updateBounds();
+            float yAcceleration = event.values[1];
+            float xAcceleration = event.values[2];
+            ball.updateBall(xAcceleration,yAcceleration, tileMap);
         }
-    }
-
-    public boolean wallCheck()
-    {
-        //passes ball to the tilemap which checks solid to see if the ball is on them
-        //pretty rough shit
-        Rect player = ball.getRect();
-
-        return tileMap.wallCollision(player);
     }
 }

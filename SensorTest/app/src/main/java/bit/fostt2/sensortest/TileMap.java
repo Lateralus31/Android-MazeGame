@@ -53,33 +53,41 @@ public class TileMap
         }
 
         in.close();
-
-        //tileImage = createMap(MainActivity);
     }
 
-    public boolean wallCollision(Rect ball)
+    public int wallCollision(Rect ball)
     {
-        boolean collision = false;
+        Rect tileRect;
 
-        Rect tileRect = new Rect();
+        int result = 0;
 
         for (int c = 0; c < columns; c++)
         {
             for (int r = 0; r < rows; r++)
             {//only checks solid tiles
-                if(tileList.getSolid(map[c][r]) == true)
+                if(map[c][r] == 1)
                 {
-                    //check if tile is near
-                    tileRect = new Rect(c*tileSize, r*tileSize, tileSize,tileSize);
-                    if (tileRect.contains(ball))
+                    tileRect = new Rect(c*tileSize, r*tileSize, c*tileSize + tileSize,r * tileSize + tileSize);
+                    if (tileRect.intersect(ball))
                     {
-                        collision = true;
+                        if ((ball.left < tileRect.right) && (ball.right > tileRect.left))
+                        {
+                            result = 1;
+                        }
+                        if ((ball.top < tileRect.bottom) && (ball.bottom > tileRect.top) && (!(ball.left < tileRect.right) && (ball.right > tileRect.left)))
+                        {
+                            result = 2;
+                        }
+
+                        return result;
                     }
                 }
             }
         }
 
-        return collision;
+        result = 0;
+
+        return result;
     }
 
     public int[][] getMap() {

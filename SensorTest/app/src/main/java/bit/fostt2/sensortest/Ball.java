@@ -8,7 +8,7 @@ public class Ball
 {
     public float xPosition, xAcceleration,xVelocity = 0.0f;
     public float yPosition, yAcceleration,yVelocity = 0.0f;
-    public float frameTime = 0.222f;
+    public float frameTime = 0.1f;
     public float xmax,ymax;
 
     public float lastX, lastY;
@@ -18,32 +18,16 @@ public class Ball
 
     Rect boundbox = new Rect(xToInt,yToInt,xToInt+50,yToInt+50);
 
-    public void updateBall()
+    public void updateBall(float x, float y, TileMap tileMap)
     {
         //last proper position
         lastX = xPosition;
         lastY = yPosition;
 
-        //check each box
+        xAcceleration = x;
+        yAcceleration = y;
 
-        boolean collide = false;
-
-        if (xPosition > xmax)
-        {
-            xPosition = xmax;
-        }
-        else if (xPosition < 0)
-        {
-            xPosition = 0;
-        }
-        if (yPosition > ymax)
-        {
-            yPosition = ymax;
-        }
-        else if (yPosition < 0)
-        {
-            yPosition = 0;
-        }
+        int collide = 0;
 
         //calculate the new speed
         xVelocity += (xAcceleration * frameTime);
@@ -53,27 +37,52 @@ public class Ball
         float xS = (xVelocity/2)*frameTime;
         float yS = (yVelocity/2)*frameTime;
 
+        float newX = xPosition -= xS;
+        float newY = yPosition -= yS;
         //allow for negatives
-        xPosition -= xS;
-        yPosition -= yS;
 
+        updateBounds();
+
+        int left = (int) (boundbox.left - xS);
+        int right = left + 50;
+        int top = (int) (boundbox.top - yS);
+        int bottom = top + 50;
+
+        Rect bounds = new Rect(left,top,right,bottom);
+
+        collide = tileMap.wallCollision(bounds);
+
+        if ((newX < xmax) && (newX > 0) && (collide != 1))
+        {
+            xPosition = newX;
+        }
+        else
+        {
+            xPosition = lastX;
+            xVelocity *= -.75;
+        }
+        if ((newY < ymax) && (newY > 0) && (collide != 2))
+        {
+            yPosition = newY;
+        }
+        else
+        {
+            yPosition = lastY;
+            yVelocity *= -.75;
+        }
 
         xToInt = (int) xPosition;
         yToInt = (int) yPosition;
     }
 
-    public void lastPosition()
-    {
-        xPosition = lastX;
-        yPosition = lastY;
-    }
-
     public void resetBall()
     {
-        setxAcceleration(0);
-        setyAcceleration(0);
-        setxPosition(50);
-        setyPosition(50);
+        xAcceleration = 0;
+        yAcceleration = 0;
+        xVelocity = 0;
+        yVelocity = 0;
+        xPosition = 40;
+        yPosition = 40;
     }
 
     public float getXPosition()
