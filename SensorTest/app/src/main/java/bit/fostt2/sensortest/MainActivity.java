@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Display;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +49,10 @@ public class MainActivity extends Activity implements SensorEventListener
     private Bitmap mHole;
     private Bitmap mBackground;
 
+    //TIMER
+    private Handler handler = new Handler();
+    private String levelTime;
+    //Create an instance of sensorManager
     private SensorManager sensorManager = null;
     CustomDrawableView mCustomDrawableView = null;
 
@@ -55,10 +61,11 @@ public class MainActivity extends Activity implements SensorEventListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         //Set FullScreen & portrait
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //Stop screen from dimming
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         finish = new Finish(600,1100);
@@ -103,8 +110,29 @@ public class MainActivity extends Activity implements SensorEventListener
         //Set boundbox for Finish etc
         finish.updateBounds();
         hole1.updateBounds();
+<<<<<<< HEAD
+=======
+
+        //Timer
+        handler.postDelayed(runnable, 100);
+>>>>>>> origin/master
     }
 
+    //Timer
+    //Using handler as timer as it uses less memory
+    private Runnable runnable = new Runnable()
+    {
+        int currentTime = 0;
+        @Override
+        public void run()
+        {
+            currentTime++;
+            levelTime = String.valueOf(currentTime);
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+    //Custom view for drawing game to
     public class CustomDrawableView extends View
     {
         public CustomDrawableView(Context context)
@@ -117,7 +145,7 @@ public class MainActivity extends Activity implements SensorEventListener
             final int dstHeight = 30;
             mBall = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
             mFinish = Bitmap.createScaledBitmap(finish, 100, 100, true);
-            mHole = Bitmap.createScaledBitmap(hole,100,100, true);
+            mHole = Bitmap.createScaledBitmap(hole, 100, 100, true);
             mBackground = createMap();
         }
 
@@ -131,12 +159,22 @@ public class MainActivity extends Activity implements SensorEventListener
             canvas.drawBitmap(bitmapFinish, finish.xPosition, finish.yPosition, null);
             canvas.drawBitmap(bitmapHole, hole1.xPosition, hole1.yPosition, null);
             canvas.drawBitmap(bitmapBall, ball.xPosition, ball.yPosition, null);
-
+            //Draw timer
+            Paint paint = new Paint();
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(36);
+            canvas.drawText(levelTime, 10, 35, paint);
             invalidate();
         }
     }
 
+<<<<<<< HEAD
     public Bitmap createMap()//draws the tilemap to a bitmap which is called everytime it needs to be drawn
+=======
+    public Bitmap createMap()
+            //the tilemap, draws all the tiles in here then stores it as a bitmap
+            //the stored bitmap is the one thats called so it doesnt run this everytime.
+>>>>>>> origin/master
     {
         int map[][] = tileMap.getMap();
         int columns = tileMap.getColumns();
@@ -205,6 +243,12 @@ public class MainActivity extends Activity implements SensorEventListener
         {
             ball.setxAcceleration(0);
             ball.setyAcceleration(0);
+            ball.setxPosition(100000);
+            ball.setyPosition(100000);
+            Toast.makeText(getApplicationContext(), "YOU WIN!!!!", Toast.LENGTH_LONG).show();
+            sensorManager.unregisterListener(this);
+            super.onStop();
+            handler.removeCallbacks(runnable);
         }
         else if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
         {
