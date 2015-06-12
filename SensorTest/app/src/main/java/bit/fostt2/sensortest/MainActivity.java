@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Display;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +53,10 @@ public class MainActivity extends Activity implements SensorEventListener
     private Bitmap mHole;
     private Bitmap mBackground;
 
+    //TIMER
+    private Handler handler = new Handler();
+    private String levelTime;
+
     private SensorManager sensorManager = null;
     CustomDrawableView mCustomDrawableView = null;
 
@@ -59,10 +65,11 @@ public class MainActivity extends Activity implements SensorEventListener
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         //Set FullScreen & portrait
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //Stop screen from dimming
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Show instructions on start
@@ -114,8 +121,25 @@ public class MainActivity extends Activity implements SensorEventListener
         finish.updateBounds();
         hole1.updateBounds();
 
-
+        //Timer
+        handler.postDelayed(runnable, 100);
     }
+
+    //Timer
+    private Runnable runnable = new Runnable()
+    {
+        int currentTime = 0;
+        @Override
+        public void run()
+        {
+            currentTime++;
+            levelTime = String.valueOf(currentTime);
+            //Toast.makeText(getApplicationContext(), levelTime, Toast.LENGTH_SHORT).show();
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+
 
     public class CustomDrawableView extends View
     {
@@ -129,7 +153,7 @@ public class MainActivity extends Activity implements SensorEventListener
             final int dstHeight = 50;
             mBall = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
             mFinish = Bitmap.createScaledBitmap(finish, 100, 100, true);
-            mHole = Bitmap.createScaledBitmap(hole,100,100, true);
+            mHole = Bitmap.createScaledBitmap(hole, 100, 100, true);
             mBackground = createMap();
         }
 
@@ -143,7 +167,11 @@ public class MainActivity extends Activity implements SensorEventListener
             canvas.drawBitmap(bitmapFinish, finish.xPosition, finish.yPosition, null);
             canvas.drawBitmap(bitmapHole, hole1.xPosition, hole1.yPosition, null);
             canvas.drawBitmap(bitmapBall, ball.xPosition, ball.yPosition, null);
-
+            //Draw timer
+            Paint paint = new Paint();
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(36);
+            canvas.drawText(levelTime, 10, 35, paint);
             invalidate();
         }
     }
