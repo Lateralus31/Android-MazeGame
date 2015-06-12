@@ -110,12 +110,9 @@ public class MainActivity extends Activity implements SensorEventListener
         //Set boundbox for Finish etc
         finish.updateBounds();
         hole1.updateBounds();
-<<<<<<< HEAD
-=======
 
         //Timer
         handler.postDelayed(runnable, 100);
->>>>>>> origin/master
     }
 
     //Timer
@@ -168,13 +165,10 @@ public class MainActivity extends Activity implements SensorEventListener
         }
     }
 
-<<<<<<< HEAD
-    public Bitmap createMap()//draws the tilemap to a bitmap which is called everytime it needs to be drawn
-=======
     public Bitmap createMap()
             //the tilemap, draws all the tiles in here then stores it as a bitmap
             //the stored bitmap is the one thats called so it doesnt run this everytime.
->>>>>>> origin/master
+
     {
         int map[][] = tileMap.getMap();
         int columns = tileMap.getColumns();
