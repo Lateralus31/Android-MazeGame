@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements SensorEventListener
     //TIMER
     private Handler handler = new Handler();
     private String levelTime;
-
+    //Create an instance of sensorManager
     private SensorManager sensorManager = null;
     CustomDrawableView mCustomDrawableView = null;
 
@@ -126,6 +126,7 @@ public class MainActivity extends Activity implements SensorEventListener
     }
 
     //Timer
+    //Using handler as timer as it uses less memory
     private Runnable runnable = new Runnable()
     {
         int currentTime = 0;
@@ -134,13 +135,11 @@ public class MainActivity extends Activity implements SensorEventListener
         {
             currentTime++;
             levelTime = String.valueOf(currentTime);
-            //Toast.makeText(getApplicationContext(), levelTime, Toast.LENGTH_SHORT).show();
             handler.postDelayed(this, 1000);
         }
     };
 
-
-
+    //Custom view for drawing game to
     public class CustomDrawableView extends View
     {
         public CustomDrawableView(Context context)
@@ -177,7 +176,7 @@ public class MainActivity extends Activity implements SensorEventListener
     }
 
     public Bitmap createMap()
-            //the tilemap shit, draws all the tiles in here then stores it as a bitmap
+            //the tilemap, draws all the tiles in here then stores it as a bitmap
             //the stored bitmap is the one thats called so it doesnt run this everytime.
     {
         int map[][] = tileMap.getMap();
@@ -248,6 +247,12 @@ public class MainActivity extends Activity implements SensorEventListener
         {
             ball.setxAcceleration(0);
             ball.setyAcceleration(0);
+            ball.setxPosition(100000);
+            ball.setyPosition(100000);
+            Toast.makeText(getApplicationContext(), "YOU WIN!!!!", Toast.LENGTH_LONG).show();
+            sensorManager.unregisterListener(this);
+            super.onStop();
+            handler.removeCallbacks(runnable);
         }
         else if (event.sensor.getType() == Sensor.TYPE_ORIENTATION)
         {
