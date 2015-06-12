@@ -34,14 +34,10 @@ import java.io.InputStream;
 
 
 public class MainActivity extends Activity implements SensorEventListener
-{//tablet 775x, 1400y
-    static final int FINISHX = 600;
-    static final int FINISHY = 1100;
-
+{
     Ball ball = new Ball();
-    Finish finish = new Finish(FINISHX,FINISHY);
-    //tablet 750,800
-    Finish hole1 = new Finish(600,350);
+    Finish finish;
+    Finish hole1;
 
     private TileList tileList;
     private TileMap tileMap;
@@ -65,29 +61,23 @@ public class MainActivity extends Activity implements SensorEventListener
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //Show instructions on start
-        Toast.makeText(getApplicationContext(), "Tilt the device to control the ball", Toast.LENGTH_LONG).show();
+        finish = new Finish(600,1100);
+        hole1 = new Finish(600,350);
 
         //creating tiles and tilemap
         Bitmap bmp;
-
         tileList = new TileList(2);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
         tileList.setArrayEntry(0, bmp, true);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.block1);
         tileList.setArrayEntry(1, bmp, false);
 
-
-        // all the layout shit should be dynamic apart from the holes which i have moved
         try {
             AssetManager am = getAssets();
             //using the s3 layout
-            //the tablet layout is just called "map.txt" and its in the same folder
-            //if you use the tablet layout you will have to adjust the  ball and hole positions and change the tilemap below
             InputStream is = am.open("map(s3).txt");
-            //  s3 720 x 1280              23,40,32
-            //  tablet 1360 x 1920         19,30,64
-            tileMap = new TileMap(tileList,23,40,32,is);
+            //  s3 720 x 1280     23,40,32
+            tileMap = new TileMap(23,40,32,is);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,14 +97,12 @@ public class MainActivity extends Activity implements SensorEventListener
 
         Point size = new Point();
         display.getSize(size);
-        ball.xmax = size.x - 50; //(float)display.getWidth()
-        ball.ymax = size.y - 50; //(float)display.getHeight()\
+        ball.xmax = size.x - 30; //(float)display.getWidth()
+        ball.ymax = size.y - 30; //(float)display.getHeight()\
 
         //Set boundbox for Finish etc
         finish.updateBounds();
         hole1.updateBounds();
-
-
     }
 
     public class CustomDrawableView extends View
@@ -125,8 +113,8 @@ public class MainActivity extends Activity implements SensorEventListener
             Bitmap ball = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
             Bitmap finish = BitmapFactory.decodeResource(getResources(), R.drawable.finish);
             Bitmap hole = BitmapFactory.decodeResource(getResources(), R.drawable.hole);
-            final int dstWidth = 50;
-            final int dstHeight = 50;
+            final int dstWidth = 30;
+            final int dstHeight = 30;
             mBall = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
             mFinish = Bitmap.createScaledBitmap(finish, 100, 100, true);
             mHole = Bitmap.createScaledBitmap(hole,100,100, true);
@@ -148,9 +136,7 @@ public class MainActivity extends Activity implements SensorEventListener
         }
     }
 
-    public Bitmap createMap()
-            //the tilemap shit, draws all the tiles in here then stores it as a bitmap
-            //the stored bitmap is the one thats called so it doesnt run this everytime.
+    public Bitmap createMap()//draws the tilemap to a bitmap which is called everytime it needs to be drawn
     {
         int map[][] = tileMap.getMap();
         int columns = tileMap.getColumns();
@@ -169,15 +155,14 @@ public class MainActivity extends Activity implements SensorEventListener
 
         for(int c = 0; c < columns; c++)
         {
+            xPos = c * tileSize;
             for (int r = 0; r < rows; r++)
             {
+                yPos = r * tileSize;
                 int textureType = map[c][r];
                 Bitmap texture = tileList.getTileBitmap(textureType);
                 mapCanvas.drawBitmap(texture, xPos, yPos, tilePaint);
-                yPos += tileSize;
             }
-            xPos += tileSize;
-            yPos = 0;
         }
 
         return tileMapImage;
@@ -210,12 +195,12 @@ public class MainActivity extends Activity implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        //red hole
+        //hole
         if(hole1.checkForBall(ball.boundbox))
         {
             ball.resetBall();
         }
-        //yellow finish hole
+        //finish line
         if(finish.checkForBall(ball.boundbox))
         {
             ball.setxAcceleration(0);

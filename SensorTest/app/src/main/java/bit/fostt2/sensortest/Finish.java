@@ -18,11 +18,6 @@ public class Finish
     {
         boolean finished = false;
 
-        //int xToInt = (int) x;
-        //int yToInt = (int) y;
-
-        //Rect rect = new Rect(xPosition-100,yPosition-100,xPosition+100,yPosition+100);
-
         if(boundbox.contains(ball))
         {
             finished = true;
